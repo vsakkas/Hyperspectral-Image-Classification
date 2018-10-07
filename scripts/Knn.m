@@ -1,11 +1,11 @@
-function [z]=Knn(k,train_array,train_labels,test_array)
+function [z]=Knn(k,train_array,train_labels,array)
 
 [l,N1]=size(train_array);
-[l,N]=size(test_array);
+[l,N]=size(array);
 num_of_classes=max(train_labels);
 % Calculate the squared eucleidian distance of a point from each reference vector
 for i=1:N
-    distance=sum((test_array(:,i)*ones(1,N1)-train_array).^2);
+    distance=sum((array(:,i)*ones(1,N1)-train_array).^2);
     [sorted,nearest]=sort(distance);
     % Count occurence of each class for the top k reference vectors
     ref_vector=zeros(1,num_of_classes);
