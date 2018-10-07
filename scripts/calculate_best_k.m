@@ -1,4 +1,4 @@
-function [best_k]=calculate_best_k(Train_array_response,Train_array_pos, Test_array_pos, Test_array_response, c)
+function [best_k, knn_test_response]=calculate_best_k(Train_array_response,Train_array_pos, Test_array_pos, Test_array_response)
 
 % Split the training data into 5 parts using cross-validation
 indices = crossvalind('Kfold', Train_array_response, 5);
@@ -28,4 +28,4 @@ for k=1:2:17
         lowest_err=avg_err;
     end
 end
-best_k
+[best_k, knn_test_response];

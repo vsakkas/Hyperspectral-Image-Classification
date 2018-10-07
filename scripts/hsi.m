@@ -82,19 +82,7 @@ for i=1:5
 end
 
 %%% Naive Bayes %%%
-% Calculate the pdf for each element and for each class, sum the results
-% and pick the index of the max value (where the index refers to the class
-% to pick)
-naive_probs=[];
-for i=1:5
-    for j=1:204
-        perFeature(i,j,:)=normpdf(Test_array(j,:),m_hat(i,j),sqrt(S_hat(i,j)));
-    end
-end
-naive_probs=sum(perFeature,2);
-naive_probs = squeeze(naive_probs);
-[max_value, idx]=max(naive_probs);
-classified=idx;
+classified=naive_bayes_classifier(S_hat, m_hat, Test_array);
 
 % Calculate the error rate, print the confusion matrix and use it to
 % calculate the precision of the Naive Bayes classifier
@@ -103,71 +91,20 @@ naive_error=sum(true_labels~=classified)/length(classified)
 confusion_matrix = confusionmat(classified, true_labels)
 precision = sum(trace(confusion_matrix))/sum(sum(confusion_matrix))
 
-% Applying the Naive Bayes Classifiers on all data and creating a figure
-% with all the classified elements
-
-% Create figure with the classified elements
-%Result_Fig = zeros(p,n);
-%for i=1:length(Test_array_pos)
-%    Result_Fig(Test_array_pos(i,1),Test_array_pos(i,2)) = classified(1,i);
-%end
-%figure('Name', 'Naive Bayes'); imagesc(Result_Fig);
-
 %%% Eucleidian Classifier %%%
 m_hat=m_hat';
-[l,c]=size(m_hat);
-[l,N]=size(Test_array);
 
-% Calculate the squared Eucleidian distance
-for i=1:N
-    for j=1:c
-        distance(j)=sqrt((Test_array(:,i)-m_hat(:,j))'*(Test_array(:,i)-m_hat(:,j)));
-    end
-    [num,idx(i)]=min(distance);
-end
-classified=idx;
+classified=euclidean_distance_classifier(m_hat, Test_array);
+
 % Calculate the error rate, print the confusion matrix and use it to
 % calculate the precision of the Eucleidian classifier
 eucleidian_error=sum(true_labels~=classified)/length(classified)
 confusion_matrix=confusionmat(classified, true_labels)
 precision=sum(trace(confusion_matrix))/sum(sum(confusion_matrix))
 
-% Create figure with the classified elements
-%Result_Fig = zeros(p,n);
-%for i=1:length(Test_array_pos)
-%    Result_Fig(Test_array_pos(i,1),Test_array_pos(i,2)) = classified(1,i);
-%end
-%figure('Name','Eucleidian Distance'); imagesc(Result_Fig);
-
 %%% KNN %%%
-% Split the training data into 5 parts using cross-validation
-indices = crossvalind('Kfold', Train_array_response, 5);
-best_k=-1;
-lowest_error=-1;
-% Pick the best value for k by training the KNN classifier 5 times each
-% time different parts of the split dataset. Calculate each time the error
-% rate and pick the k that gives the lowest error rate
-for k=1:2:17
-    avg_err=0;
-    for i=1:5
-        knn_train=Train_array_pos(find(indices ~= i),:);
-        knn_train_response=Train_array_response(:,find(indices ~= i));
-        knn_test=Test_array_pos(find(indices == i),:);
-        knn_test_response=Test_array_response(:,find(indices == i));
+[best_k, knn_test_response] = calculate_best_k(Train_array_response,Train_array_pos, Test_array_pos, Test_array_response);
 
-        knn_train=knn_train';
-        knn_test=knn_test';
-
-        result = Knn(k,knn_train,knn_train_response,knn_test);
-        pr_err = sum(result~=knn_test_response)/length(knn_test_response');
-        avg_err=avg_err+pr_err;
-    end
-    avg_err=avg_err/5; % use the average error rate for the current value of k
-    if((best_k==-1) || (avg_err<lowest_err))
-        best_k=k;
-        lowest_err=avg_err;
-    end
-end
 classified= k_nn_classifier(Train_array_pos',Train_array_response',best_k,Test_array_pos');
 knn_error = sum(classified~=Test_array_response)/length(knn_test_response)
 confusion_matrix=confusionmat(classified, Test_array_response)

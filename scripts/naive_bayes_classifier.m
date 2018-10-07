@@ -1,4 +1,4 @@
-function [classified]=naive_bayes_classifier(S_hat, m_hat)
+function [classified]=naive_bayes_classifier(S_hat, m_hat, Test_array)
 
 % Calculate the pdf for each element and for each class, sum the results
 % and pick the index of the max value (where the index refers to the class

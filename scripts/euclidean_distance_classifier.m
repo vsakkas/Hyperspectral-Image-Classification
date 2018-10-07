@@ -1,4 +1,7 @@
-function [classified]=euclidean_distance_classifier(m_hat, Test_array, c)
+function [classified]=euclidean_distance_classifier(m_hat, Test_array)
+
+[l,c]=size(m_hat);
+[l,N]=size(Test_array);
 
 % Calculate the squared Eucleidian distance
 for i=1:N
